@@ -100,7 +100,7 @@ public class ServerController
 
             if ( connectiontype.equals ( "existing" ) )
             {
-                if ( !table.containsKey ( username ) )
+                if ( !table.containsKey ( username ) )  // user does not exist
                 {
                     //nu.write ( "Invalid" );
                     Message msg = new Message ("Invalid");
@@ -112,7 +112,7 @@ public class ServerController
                     info = table.get ( username );
                     String realPassword = info.getPassword ();
 
-                    if ( !password.equals ( realPassword ) )
+                    if ( !password.equals ( realPassword ) )  // password mismatch
                     {
                         //nu.write ( "Invalid" );
                         Message msg = new Message ("Invalid");
@@ -120,23 +120,23 @@ public class ServerController
                     }
                     else
                     {
-                        if(names.contains ( username ))
+                        if(names.contains ( username )) // already logged in somewhere else
                         {
                             info = table.get ( username );
                             NetworkUtil existingLink = info.getNu ();
                             //existingLink.write ( "close previous" );
-                            Message msg = new Message ("close previous");
-                            nu.write(msg);
+                            Message msg = new Message ("close previous"); // terminate previous session
+                            existingLink.write(msg);
 
                             info.setNu ( nu );
                             info.setClientAddress ( clientAddress );
                             table.put ( username, info );
                             //nu.write ( "new login" );
-                            msg = new Message ("new login");
+                            msg = new Message ("new login"); // update new connection
                             nu.write(msg);
                         }
 
-                        else
+                        else  // existing user logs in
                         {
                             names.add ( username );
                             info.setNu ( nu );
@@ -150,9 +150,9 @@ public class ServerController
                 }
 
             }
-            else if ( connectiontype.equals ( "new account" ) )
+            else if ( connectiontype.equals ( "new account" ) )  // new account request
             {
-                if(names.contains ( username ))
+                if(names.contains ( username )) // username already exists
                 {
                     //nu.write("occupied");
                     Message msg = new Message ("occupied");
@@ -161,7 +161,7 @@ public class ServerController
 
                 else
                 {
-                    names.add ( username );
+                    names.add ( username ); // create new account
                     info = new Info ( password, nu, clientAddress);
                     table.put ( username, info );
                     //nu.write("hello");
