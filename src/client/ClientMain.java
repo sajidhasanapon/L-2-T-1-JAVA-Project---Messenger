@@ -7,11 +7,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import sun.nio.ch.Net;
 import util.ClientInfo;
 import util.NetworkUtil;
-
-import java.net.InetAddress;
+import java.util.ArrayList;
 
 public class ClientMain extends Application
 {
@@ -23,6 +21,7 @@ public class ClientMain extends Application
     String username;
     String password;
     ClientChatController waiter;
+    ArrayList<String> onlineNowUsersList;
 
     @Override
     public void start ( Stage primaryStage ) throws Exception
@@ -58,7 +57,7 @@ public class ClientMain extends Application
 
     public void establishConnection(String connectionType, String username, String password, String serverAddress)throws Exception
     {
-        ClientInfo clientInfo = new ClientInfo ( connectionType, username, password, serverAddress);
+        ClientInfo clientInfo = new ClientInfo ( connectionType, username, password);
 
         //String serverAddress = ;
         this.serverAddress = serverAddress;
@@ -88,13 +87,14 @@ public class ClientMain extends Application
             waiter.setServerAddress ( serverAddress );
             waiter.setStage(stage);
             waiter.setRoot ( root );
+            waiter.setOnlineUsersList ( onlineNowUsersList);
 
             waiter.show();
         }
 
         catch ( Exception e )
         {
-            System.out.println ( "EXCEPTION : ClientConnectionController/showWaitingScreen/loader.load" );
+            System.out.println ( "EXCEPTION : ClientMain/showChatScreen" );
         }
 
         //new AcceptThread ( username, waiter );
@@ -107,7 +107,7 @@ public class ClientMain extends Application
         showLoginScreen ();
 
         NetworkUtil nc = new NetworkUtil (serverAddress, 44444);
-        nc.write (username);
+        nc.write ("0" + username);
 
         Platform.runLater ( () -> {
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -118,6 +118,12 @@ public class ClientMain extends Application
 
             nu.closeConnection ();
         } );
+    }
+
+    public void visibilityControl()
+    {
+        NetworkUtil nc = new NetworkUtil (serverAddress, 44444);
+        nc.write ("1" + username);
     }
 
     public void invalidLogin ()
@@ -206,6 +212,17 @@ public class ClientMain extends Application
     public  void showMessage(String sender, String message)
     {
         waiter.showMessage(sender, message);
+    }
+
+    public void setOnlineUsersList( ArrayList<String> onlineNowUsersList)
+    {
+        this.onlineNowUsersList = new ArrayList<> ( onlineNowUsersList );
+    }
+
+    public void updateOnlineUsersList( String newUser)
+    {
+        onlineNowUsersList.add ( newUser );
+        waiter.update(newUser);
     }
 
 

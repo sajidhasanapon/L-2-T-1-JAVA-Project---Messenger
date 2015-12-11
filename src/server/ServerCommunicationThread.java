@@ -7,9 +7,6 @@ import util.NetworkUtil;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-/**
- * Created by Sajid Hasan on 12/4/2015.
- */
 public class ServerCommunicationThread implements Runnable
 {
     private Thread thr;
@@ -17,14 +14,12 @@ public class ServerCommunicationThread implements Runnable
     ServerSocket servSock;
     Socket clientSock;
     ServerController serverController;
-    ClientInfo clientInfo;
-    String username;
 
     ServerCommunicationThread (ServerController serverController)
     {
         try
         {
-            servSock = new ServerSocket ( 55566 );
+            servSock = new ServerSocket ( 55555 );
             this.thr = new Thread ( this );
             this.serverController = serverController;
             thr.start ();

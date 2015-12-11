@@ -1,18 +1,18 @@
 package client;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 import util.Message;
 import util.NetworkUtil;
 import java.net.InetAddress;
+import java.util.ArrayList;
 
 
 public class ClientChatController
@@ -24,6 +24,7 @@ public class ClientChatController
     private String serverAddress;
     private Stage stage;
     Parent root;
+    int visibility = 0;
 
     public void setServerAddress(String serverAddress)
     {
@@ -61,15 +62,15 @@ public class ClientChatController
     @FXML
     private Button signoutButton;
 
+    @FXML
+    private Button visibilityButton;
+
+    @FXML
+    private Label statusLabel;
+
 
     public void show()
     {
-        names.add("C1");
-        onlineList.setItems ( names );
-        names.add("C2");
-        onlineList.setItems ( names );
-        names.add("C3");
-
         onlineList.setItems ( names );
 
         stage.setTitle ( sender );
@@ -109,7 +110,7 @@ public class ClientChatController
         {
             Message msg = new Message ( sender, receiver, message );
 
-            NetworkUtil nu = new NetworkUtil ( serverAddress, 55566 );
+            NetworkUtil nu = new NetworkUtil ( serverAddress, 55555 );
             nu.write ( msg );
         }
     }
@@ -119,6 +120,29 @@ public class ClientChatController
     void signout ( ActionEvent event ) throws Exception
     {
         clientMain.logout ();
+    }
+
+    @FXML
+    void visibilityControl()
+    {
+
+
+        if (visibility == 0)
+        {
+            statusLabel.setText ( "Chat is turned off" );
+            visibilityButton.setText ( "Turn on chat" );
+            visibility = 1;
+        }
+
+        else
+        {
+            statusLabel.setText ( "" );
+            visibilityButton.setText ( "Turn off chat" );
+            visibility = 0;
+        }
+
+        clientMain.visibilityControl();
+
     }
 
 
@@ -131,10 +155,35 @@ public class ClientChatController
     }
 
 
-    public void setOnlineList(String name)
+    public void setOnlineUsersList(ArrayList<String> onlineUsersList)
     {
-        names.add(name);
+        for ( String name:onlineUsersList)
+        {
+            if (!name.equals ( sender ))
+            {
+                names.add ( name );
+                System.out.println (name);
+            }
+        }
     }
 
+    public void update(String newUser)
+    {
+        Platform.runLater ( () -> {
+
+            if (names.contains ( newUser ))
+            {
+                names.remove ( newUser );
+            }
+
+            else
+            {
+                if (!newUser.equals ( sender ))
+                {
+                    names.add ( newUser );
+                }
+            }
+        } );
+    }
 }
 

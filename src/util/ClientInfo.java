@@ -9,14 +9,12 @@ public class ClientInfo implements Serializable
     private String connectionType;
     private String username;
     private String password;
-    String address;
 
-    public ClientInfo ( String connectionType, String username, String password, String address)throws Exception
+    public ClientInfo ( String connectionType, String username, String password)throws Exception
     {
         this.connectionType = connectionType;
         this.username = username;
         this.password = password;
-        this.address = address;
     }
 
     public String getConnectionType ()
@@ -32,11 +30,6 @@ public class ClientInfo implements Serializable
     public String getPassword ()
     {
         return password;
-    }
-
-    public String getAddress ()
-    {
-        return address;
     }
 
     public void setUsername ( String username )

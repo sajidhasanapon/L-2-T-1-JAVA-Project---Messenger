@@ -6,9 +6,8 @@ public class Info
 {
     private String password;
     NetworkUtil nu;
-    String clientAddress;
 
-    public Info ( String password, NetworkUtil nu , String clientAddress)
+    public Info ( String password, NetworkUtil nu)
     {
         this.password = password;
         this.nu = nu;
@@ -27,15 +26,5 @@ public class Info
     public void setNu ( NetworkUtil nu )
     {
         this.nu = nu;
-    }
-
-    public String getClientAddress ()
-    {
-        return clientAddress;
-    }
-
-    public void setClientAddress ( String clientAddress )
-    {
-        this.clientAddress = clientAddress;
     }
 }

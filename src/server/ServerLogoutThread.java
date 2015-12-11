@@ -39,12 +39,22 @@ public class ServerLogoutThread implements Runnable
                 Socket clientSock = serverSocket.accept ();
                 NetworkUtil nu = new NetworkUtil ( clientSock );
                 String username = (String)nu.read ();
-                serverController.logout ( username );
+                char action = username.charAt ( 0 );
+                if (action == '0')
+                {
+                    serverController.logout ( username.substring ( 1 ) );
+                }
+
+                else if (action == '1')
+                {
+                    serverController.toggleVisibility(username.substring ( 1 ));
+                }
+
             }
         }
         catch ( Exception e )
         {
-            //System.out.println ("Problem in Problem in ServerLogoutThread run method" + e );
+            System.out.println ("Problem in Problem in ServerLogoutThread run method" + e );
         }
     }
 }

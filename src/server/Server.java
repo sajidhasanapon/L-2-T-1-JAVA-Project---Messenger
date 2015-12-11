@@ -28,7 +28,6 @@ public class Server extends Application
             new ServerConnectionThread (serverController);
             new ServerLogoutThread (serverController);
             new ServerCommunicationThread (serverController);
-            //new ServerWriteThread (serverController);
         }
         catch ( Exception e )
         {

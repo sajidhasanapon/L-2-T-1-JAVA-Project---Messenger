@@ -19,6 +19,7 @@ import util.Message;
 import util.NetworkUtil;
 
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.Hashtable;
 
 public class ServerController
@@ -30,6 +31,7 @@ public class ServerController
     String message;
     String username;
     Info info;
+    ArrayList<String> onlineNow = new ArrayList<> ();
 
     @FXML
     private ListView<String> clientList = new ListView<> ();
@@ -82,9 +84,6 @@ public class ServerController
         nu.write ( message );
 
         clear ();
-
-        //names.remove ( clientID );
-        //nu.closeConnection ();
     }
 
 
@@ -94,7 +93,7 @@ public class ServerController
     }
 
 
-    public void set ( String connectiontype, String username, String password, NetworkUtil nu, String clientAddress ) throws Exception
+    public void set ( String connectiontype, String username, String password, NetworkUtil nu) throws Exception
     {
         Platform.runLater ( () ->{
 
@@ -102,7 +101,6 @@ public class ServerController
             {
                 if ( !table.containsKey ( username ) )  // user does not exist
                 {
-                    //nu.write ( "Invalid" );
                     Message msg = new Message ("Invalid");
                     nu.write(msg);
                 }
@@ -114,7 +112,6 @@ public class ServerController
 
                     if ( !password.equals ( realPassword ) )  // password mismatch
                     {
-                        //nu.write ( "Invalid" );
                         Message msg = new Message ("Invalid");
                         nu.write(msg);
                     }
@@ -124,27 +121,27 @@ public class ServerController
                         {
                             info = table.get ( username );
                             NetworkUtil existingLink = info.getNu ();
-                            //existingLink.write ( "close previous" );
+
                             Message msg = new Message ("close previous"); // terminate previous session
                             existingLink.write(msg);
 
                             info.setNu ( nu );
-                            info.setClientAddress ( clientAddress );
                             table.put ( username, info );
-                            //nu.write ( "new login" );
-                            msg = new Message ("new login"); // update new connection
+
+                            msg = new Message ("new login", onlineNow); // update new connection
                             nu.write(msg);
                         }
 
-                        else  // existing user logs in
+                        else  // existing user logs in. no session open elsewhere.
                         {
                             names.add ( username );
                             info.setNu ( nu );
-                            info.setClientAddress ( clientAddress );
                             table.put ( username, info );
-                            //nu.write("welcome back");
-                            Message msg = new Message ("welcome back");
+                            Message msg = new Message ("welcome back", onlineNow);
                             nu.write(msg);
+
+                            updateAllUsers (username);
+                            onlineNow.add ( username );
                         }
                     }
                 }
@@ -152,9 +149,8 @@ public class ServerController
             }
             else if ( connectiontype.equals ( "new account" ) )  // new account request
             {
-                if(names.contains ( username )) // username already exists
+                if(table.containsKey ( username )) // username already exists
                 {
-                    //nu.write("occupied");
                     Message msg = new Message ("occupied");
                     nu.write(msg);
                 }
@@ -162,11 +158,13 @@ public class ServerController
                 else
                 {
                     names.add ( username ); // create new account
-                    info = new Info ( password, nu, clientAddress);
+                    info = new Info ( password, nu);
                     table.put ( username, info );
-                    //nu.write("hello");
-                    Message msg = new Message ("hello");
+                    Message msg = new Message ("hello", onlineNow);
                     nu.write(msg);
+
+                    updateAllUsers (username);
+                    onlineNow.add ( username );
                 }
             }
         } );
@@ -178,12 +176,33 @@ public class ServerController
             names.remove ( username );
             info = table.get ( username );
             nu = info.getNu ();
-            //nu.write("logout");
             Message msg = new Message ("logout");
             nu.write(msg);
             nu.closeConnection ();
 
+            if (onlineNow.contains ( username ))
+            {
+                updateAllUsers (username);
+                onlineNow.remove ( username );
+            }
+
         } );
+    }
+
+    public void toggleVisibility(String username)
+    {
+
+        if (onlineNow.contains ( username ))
+        {
+            onlineNow.remove ( username );
+        }
+
+        else
+        {
+            onlineNow.add ( username );
+        }
+
+        updateAllUsers ( username );
     }
 
     public void newMessage( Message m)throws Exception
@@ -191,6 +210,20 @@ public class ServerController
         Info info = table.get(m.getReceiver ());
         NetworkUtil nuCommunication = info.getNu ();
         nuCommunication.write ( m );
+    }
+
+    public void updateAllUsers (String newUser)
+    {
+        for ( String onlineUser : names )
+        {
+            if (!onlineUser.equals ( newUser ))
+            {
+                info = table.get ( onlineUser );
+                nu = info.getNu ();
+                nu.write ( new Message ( "update", newUser ) );
+            }
+        }
+
     }
 
     public void exit ()

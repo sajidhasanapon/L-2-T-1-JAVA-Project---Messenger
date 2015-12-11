@@ -39,6 +39,7 @@ public class ClientConnectionThread implements Runnable
                     else if (message.equals("welcome back"))
                     {
                         clientMain.welcomeBack ();
+                        clientMain.setOnlineUsersList ( m.getOnlineNowUsersList () );
                     }
 
                     else if (message.equals ( "Invalid" ))
@@ -49,16 +50,25 @@ public class ClientConnectionThread implements Runnable
                     else if (message.equals ( "new login" ))
                     {
                         clientMain.newLogin();
+                        clientMain.setOnlineUsersList ( m.getOnlineNowUsersList () );
                     }
 
                     else if( message.equals("hello") )
                     {
                         clientMain.signUp ();
+                        clientMain.setOnlineUsersList ( m.getOnlineNowUsersList () );
                     }
 
                     else if( message.equals("occupied") )
                     {
                         clientMain.occupied ();
+                    }
+
+                    else if (message.equals ( "update" ))
+                    {
+                        System.out.println (m.getNewUser ());
+                        clientMain.updateOnlineUsersList ( m.getNewUser() );
+
                     }
                 }
 

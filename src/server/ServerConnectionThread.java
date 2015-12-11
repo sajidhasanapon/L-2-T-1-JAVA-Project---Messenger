@@ -13,7 +13,6 @@ public class ServerConnectionThread implements Runnable
     Socket clientSock;
     ServerController serverController;
     ClientInfo clientInfo;
-    String clientAddress;
 
     ServerConnectionThread ( ServerController serverController)
     {
@@ -41,7 +40,7 @@ public class ServerConnectionThread implements Runnable
                 clientSock = serverSocket.accept ();
                 nu = new NetworkUtil ( clientSock );
                 clientInfo = (ClientInfo) nu.read ();
-                serverController.set(clientInfo.getConnectionType (), clientInfo.getUsername (), clientInfo.getPassword (), nu, clientInfo.getAddress() );
+                serverController.set(clientInfo.getConnectionType (), clientInfo.getUsername (), clientInfo.getPassword (), nu);
             }
         }
         catch ( Exception e )

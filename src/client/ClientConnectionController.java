@@ -15,13 +15,7 @@ public class ClientConnectionController
     String password;
     String serverAddress = "127.0.0.1";
     String connectionType = "existing";
-    NetworkUtil nu;
-    Stage stage;
-    Parent root;
-    ClientChatController waiter;
-    ClientInfo clientInfo;
     ClientMain clientMain;
-    ClientConnectionThread thread;
 
     public void setClientMain ( ClientMain clientMain )
     {
