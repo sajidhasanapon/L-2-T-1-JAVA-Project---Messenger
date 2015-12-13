@@ -9,36 +9,11 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import util.ClientInfo;
 import util.NetworkUtil;
+
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
-class MyThred implements  Runnable {
-
-    Thread t;
-    ClientMain c;
-    MyThred(ClientMain c) {
-        this.c = c;
-        t = new Thread ( this );
-        t.start ();
-    }
-    @Override
-    public void run()
-    {
-            Platform.runLater ( () -> {
-                        try
-                        {
-                            this.c.showStartingScrren ();
-
-                        }
-                        catch ( Exception e )
-                        {
-                            e.printStackTrace ();
-                        }
-                    }
-            );
-
-    }
-}
 public class ClientMain extends Application
 {
 
@@ -50,30 +25,17 @@ public class ClientMain extends Application
     String password;
     ClientChatController waiter;
     ArrayList<String> onlineNowUsersList;
+    SplashScreen splashScreen;
 
     @Override
     public void start ( Stage primaryStage ) throws Exception
     {
         stage = primaryStage;
-        new MyThred ( this );
-        //Thread.sleep ( 5000 );
+        new TestSplashScreen ().initUI ();
+        Thread.sleep ( 3000 );
         showLoginScreen ();
-
     }
 
-    public void showStartingScrren()throws Exception
-    {
-        FXMLLoader loader = new FXMLLoader ();
-        loader.setLocation ( getClass ().getResource ( "Start.fxml" ) );
-        Parent root = loader.load ();
-
-        stage.setScene ( new Scene ( root, 700, 420 ) );
-        stage.show ();
-        //wait ( 1000000000 );
-        //showLoginScreen ();
-        //Thread.sleep ( 1000 );
-        //showLoginScreen ();
-    }
 
     public void showLoginScreen ()
     {

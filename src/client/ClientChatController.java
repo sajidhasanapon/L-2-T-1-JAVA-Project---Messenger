@@ -74,7 +74,7 @@ public class ClientChatController
         onlineList.setItems ( names );
 
         stage.setTitle ( sender );
-        stage.setScene ( new Scene ( root, 700, 500 ) );
+        stage.setScene ( new Scene ( root, 650, 600 ) );
         stage.show ();
     }
 

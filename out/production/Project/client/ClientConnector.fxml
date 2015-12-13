@@ -6,25 +6,32 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ClientConnectionController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #0C0067;" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ClientConnectionController">
    <children>
-      <Button fx:id="connectButton" alignment="CENTER" layoutX="232.0" layoutY="238.0" mnemonicParsing="false" onAction="#connect" prefHeight="25.0" prefWidth="136.0" text="Connect" />
+      <Button fx:id="connectButton" alignment="CENTER" layoutX="253.0" layoutY="238.0" mnemonicParsing="false" onAction="#connect" prefHeight="33.0" prefWidth="115.0" style="-fx-background-radius: 6, 5; -fx-background-insets: 0, 1; -fx-background-color: #1BC32F;" text="CONNECT" textFill="BLACK">
+         <font>
+            <Font name="Arial Bold" size="14.0" />
+         </font></Button>
       <TextField fx:id="clientName" alignment="TOP_CENTER" layoutX="252.0" layoutY="82.0" prefHeight="25.0" prefWidth="218.0" promptText="Type your name here..." />
-      <Label layoutX="142.0" layoutY="78.0" prefHeight="33.0" prefWidth="90.0" text="Username:" textFill="#0d1ad7">
+      <Label layoutX="142.0" layoutY="78.0" prefHeight="33.0" prefWidth="90.0" text="Username" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
       <PasswordField fx:id="passwordField" layoutX="252.0" layoutY="121.0" prefHeight="25.0" prefWidth="218.0" />
-      <Label layoutX="142.0" layoutY="123.0" prefHeight="17.0" prefWidth="90.0" text="Password :" textFill="#1533ab">
+      <Label layoutX="142.0" layoutY="123.0" prefHeight="17.0" prefWidth="90.0" text="Password" textFill="WHITE">
          <font>
             <Font name="System Bold" size="14.0" />
          </font>
       </Label>
-      <RadioButton fx:id="signup" layoutX="328.0" layoutY="183.0" mnemonicParsing="false" onAction="#newAccount" text="SIGN UP" textOverrun="CLIP">
+      <RadioButton fx:id="signup" layoutX="328.0" layoutY="183.0" mnemonicParsing="false" onAction="#newAccount" text="SIGN UP" textFill="#fffbfb" textOverrun="CLIP">
          <toggleGroup>
             <ToggleGroup fx:id="connectionSelecter" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="login" layoutX="202.0" layoutY="183.0" mnemonicParsing="false" onAction="#oldAccount" selected="true" text="LOG IN" toggleGroup="$connectionSelecter" />
+      <RadioButton fx:id="login" layoutX="202.0" layoutY="183.0" mnemonicParsing="false" onAction="#oldAccount" selected="true" text="LOG IN" textFill="WHITE" toggleGroup="$connectionSelecter" />
+      <Hyperlink fx:id="signUp" layoutX="446.0" layoutY="200.0" text="Sign up" textFill="WHITE" underline="true">
+         <font>
+            <Font size="14.0" />
+         </font></Hyperlink>
    </children>
 </Pane>
