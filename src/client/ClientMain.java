@@ -9,10 +9,7 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import util.ClientInfo;
 import util.NetworkUtil;
-
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class ClientMain extends Application
 {
@@ -25,17 +22,13 @@ public class ClientMain extends Application
     String password;
     ClientChatController waiter;
     ArrayList<String> onlineNowUsersList;
-    SplashScreen splashScreen;
 
     @Override
     public void start ( Stage primaryStage ) throws Exception
     {
         stage = primaryStage;
-        new TestSplashScreen ().initUI ();
-        Thread.sleep ( 3000 );
         showLoginScreen ();
     }
-
 
     public void showLoginScreen ()
     {
@@ -76,8 +69,6 @@ public class ClientMain extends Application
         nu.write ( clientInfo );
         thread = new ClientConnectionThread ( nu, this );
     }
-
-
 
 
     public void showChatScreen ()

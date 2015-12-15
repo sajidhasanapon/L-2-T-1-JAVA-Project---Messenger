@@ -2,9 +2,6 @@ package client;
 import util.Message;
 import util.NetworkUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-
 public class ClientConnectionThread implements Runnable
 {
     private ClientChatController waiter;
@@ -77,7 +74,6 @@ public class ClientConnectionThread implements Runnable
 
                 else
                 {
-
                     clientMain.showMessage(m.getSender (), m.getMessage ());
                 }
             }

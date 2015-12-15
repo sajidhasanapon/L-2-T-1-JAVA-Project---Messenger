@@ -18,8 +18,6 @@ import util.ClientInfo;
 import util.Message;
 import util.NetworkUtil;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Hashtable;
