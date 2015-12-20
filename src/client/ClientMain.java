@@ -7,107 +7,112 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import util.ClientInfo;
 import util.NetworkUtil;
 import java.util.ArrayList;
+import java.util.Hashtable;
 
-public class ClientMain extends Application
-{
+public class ClientMain extends Application {
 
     Stage stage;
-    String serverAddress;
-    ClientConnectionThread thread;
-    NetworkUtil nu;
+    String serverAddress = "127.0.0.1";
+    NetworkUtil nuConnection;
+    NetworkUtil nuGetMessage;
     String username;
     String password;
-    ClientChatController waiter;
+    ChatController chatController;
+    NewAccountController newID;
+    ConnectionController connectionController;
     ArrayList<String> onlineNowUsersList;
+    Hashtable<String, ArrayList<String>> messages;
+
+
+    public Stage getStage () {
+        return stage;
+    }
+
+    public void setStage ( Stage stage ) {
+        this.stage = stage;
+    }
+
+    public String getUsername () {
+        return username;
+    }
+
+    public void setUsername ( String username ) {
+        this.username = username;
+    }
+
+    public String getPassword () {
+        return password;
+    }
+
+    public void setPassword ( String password ) {
+        this.password = password;
+    }
 
     @Override
-    public void start ( Stage primaryStage ) throws Exception
-    {
+    public void start ( Stage primaryStage ) throws Exception {
         stage = primaryStage;
         showLoginScreen ();
     }
 
-    public void showLoginScreen ()
-    {
-        try
-        {
+    public void showLoginScreen () {
+        try {
             // XML Loading using FXMLLoader
             FXMLLoader loader = new FXMLLoader ();
             loader.setLocation ( getClass ().getResource ( "ClientConnector.fxml" ) );
             Parent root = loader.load ();
 
             // Loading the controller
-            ClientConnectionController clientConnectionController = loader.getController ();
-            clientConnectionController.setClientMain ( this );
+            ConnectionController connectionController = loader.getController ();
+
+
+            connectionController.setClientMain ( this );
+            connectionController.setServerAddress ( this.serverAddress );
+            //this.connectionController = connectionController;
 
             // Set the primary stage
-            //stage.setTitle ( "Connector" );
+            stage.setTitle ( "Meowssenger" );
             stage.setScene ( new Scene ( root, 590, 300 ) );
             stage.show ();
         }
 
-        catch ( Exception e )
-        {
+        catch ( Exception e ) {
             System.out.println ( "Prroblem in clientMain\\ClientMain\\showConnectionScreen" + e );
         }
     }
 
-    public void establishConnection(String connectionType, String username, String password, String serverAddress)throws Exception
-    {
-        ClientInfo clientInfo = new ClientInfo ( connectionType, username, password);
-
-        //String serverAddress = ;
-        this.serverAddress = serverAddress;
-        int serverPort = 33333;
-        nu = new NetworkUtil ( serverAddress, serverPort );
-
-        this.username = username;
-        this.password = password;
-        nu.write ( clientInfo );
-        thread = new ClientConnectionThread ( nu, this );
-    }
-
-
-    public void showChatScreen ()
-    {
+    public void showChatScreen () {
         FXMLLoader loader = new FXMLLoader ();
         loader.setLocation ( getClass ().getResource ( "ClientChatScreen.fxml" ) );
-        //Parent root = loader.load();
 
-        try
-        {
+        try {
             Parent root = loader.load ();
 
-            waiter = loader.getController ();
-            waiter.setClientMain ( this );
-            waiter.setSender ( username );
-            waiter.setServerAddress ( serverAddress );
-            waiter.setStage(stage);
-            waiter.setRoot ( root );
-            waiter.setOnlineUsersList ( onlineNowUsersList);
+            chatController = loader.getController ();
+            chatController.setClientMain ( this );
+            chatController.setUsername ( username );
+            chatController.setServerAddress ( serverAddress );
+            chatController.setStage ( stage );
+            chatController.setRoot ( root );
+            chatController.setOnlineUsersList ( onlineNowUsersList );
+            chatController.setChatHistory(messages);
 
-            waiter.show();
+            chatController.show();
         }
 
-        catch ( Exception e )
-        {
+        catch ( Exception e ) {
             System.out.println ( "EXCEPTION : ClientMain/showChatScreen" );
+            e.printStackTrace ();
         }
-
-        //new AcceptThread ( username, waiter );
-
     }
 
 
-    public void logout ()throws Exception
-    {
+    public void logout ()throws Exception {
         showLoginScreen ();
 
-        NetworkUtil nc = new NetworkUtil (serverAddress, 44444);
-        nc.write ("0" + username);
+        NetworkUtil nc = new NetworkUtil ( serverAddress, 44444 );
+        nc.write ( "0" + username );
 
         Platform.runLater ( () -> {
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -116,30 +121,27 @@ public class ClientMain extends Application
             alert.setContentText ( "" );
             alert.showAndWait ();
 
-            nu.closeConnection ();
+            nuConnection.closeConnection ();
         } );
     }
 
-    public void visibilityControl()
-    {
-        NetworkUtil nc = new NetworkUtil (serverAddress, 44444);
-        nc.write ("1" + username);
+    public void visibilityControl() {
+        NetworkUtil nc = new NetworkUtil ( serverAddress, 44444 );
+        nc.write ( "1" + username );
     }
 
-    public void invalidLogin ()
-    {
-        Platform.runLater ( () ->{
+    public void invalidLogin () {
+        Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.ERROR );
             alert.setTitle ( "Incorrect Credentials" );
             alert.setHeaderText ( "Incorrect Credentials" );
             alert.setContentText ( "The username and password you provided is not correct." );
             alert.showAndWait ();
-        });
+        } );
     }
 
-    public void closePrevious(NetworkUtil nu)
-    {
+    public void closePrevious ( NetworkUtil nu ) {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -154,8 +156,7 @@ public class ClientMain extends Application
 
     }
 
-    public  void welcomeBack()
-    {
+    public  void welcomeBack() {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -165,12 +166,14 @@ public class ClientMain extends Application
             alert.showAndWait ();
 
             showChatScreen ();
+            nuGetMessage = new NetworkUtil ( serverAddress, 34343 );
+            nuGetMessage.write ( username );
+            new Threads.AcceptThread ( nuGetMessage, chatController );
         } );
 
     }
 
-    public void signUp()
-    {
+    public void signUp() {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -179,12 +182,17 @@ public class ClientMain extends Application
             alert.setContentText ( "" );
             alert.showAndWait ();
 
+
             showChatScreen ();
+            nuGetMessage = new NetworkUtil ( serverAddress, 34343 );
+            System.out.println ( username );
+            nuGetMessage.write ( username );
+            new Threads.AcceptThread ( nuGetMessage, chatController );
+
         } );
     }
 
-    public void newLogin()
-    {
+    public void newLogin() {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -194,11 +202,14 @@ public class ClientMain extends Application
             alert.showAndWait ();
 
             showChatScreen ();
+
+            nuGetMessage = new NetworkUtil ( serverAddress, 34343 );
+            nuGetMessage.write ( username );
+            new Threads.AcceptThread ( nuGetMessage, chatController );
         } );
     }
 
-    public void occupied()
-    {
+    public void occupied() {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -209,25 +220,44 @@ public class ClientMain extends Application
         } );
     }
 
-    public  void showMessage(String sender, String message)
-    {
-        waiter.showMessage(sender, message);
+    public  void showMessage ( String sender, String message ) {
+        chatController.newMessage ( sender, message );
     }
 
-    public void setOnlineUsersList( ArrayList<String> onlineNowUsersList)
-    {
+    public void setOnlineUsersList ( ArrayList<String> onlineNowUsersList ) {
         this.onlineNowUsersList = new ArrayList<> ( onlineNowUsersList );
     }
 
-    public void updateOnlineUsersList( String newUser)
-    {
+    public void updateOnlineUsersList ( String newUser ) {
         onlineNowUsersList.add ( newUser );
-        waiter.update(newUser);
+        chatController.update ( newUser );
+    }
+
+    public void newAccount() throws Exception {
+        // XML Loading using FXMLLoader
+        FXMLLoader loader = new FXMLLoader ();
+        loader.setLocation ( getClass ().getResource ( "NewAccount.fxml" ) );
+        Parent root = loader.load ();
+
+        // Loading the controller
+        NewAccountController newID = loader.getController ();
+        //this.newID = newID;
+        newID.setClientMain ( this );
+        newID.setServerAddress ( this.serverAddress );
+
+        // Set the primary stage
+        stage.setTitle ( "Meowssenger" );
+        stage.setScene ( new Scene ( root, 650, 400 ) );
+        stage.show ();
+    }
+
+    public void chatHistory( Hashtable<String, ArrayList<String>> messages)
+    {
+        this.messages = messages;
     }
 
 
-    public static void main ( String[] args )
-    {
+    public static void main ( String[] args ) {
         launch ( args );
     }
 }

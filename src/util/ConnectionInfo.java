@@ -4,17 +4,28 @@ import util.NetworkUtil;
 import java.io.Serializable;
 import java.net.InetAddress;
 
-public class ClientInfo implements Serializable
+public class ConnectionInfo implements Serializable
 {
     private String connectionType;
     private String username;
     private String password;
+    private String email;
+    private String gender;
 
-    public ClientInfo ( String connectionType, String username, String password)throws Exception
+    public ConnectionInfo ( String connectionType, String username, String password)throws Exception
     {
         this.connectionType = connectionType;
         this.username = username;
         this.password = password;
+    }
+
+    public ConnectionInfo ( String connectionType, String username, String password, String email, String gender )
+    {
+        this.connectionType = connectionType;
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.gender = gender;
     }
 
     public String getConnectionType ()
@@ -47,7 +58,25 @@ public class ClientInfo implements Serializable
         this.password = password;
     }
 
+    public String getEmail ()
+    {
+        return email;
+    }
 
+    public void setEmail ( String email )
+    {
+        this.email = email;
+    }
+
+    public String getGender ()
+    {
+        return gender;
+    }
+
+    public void setGender ( String gender )
+    {
+        this.gender = gender;
+    }
 }
 
 

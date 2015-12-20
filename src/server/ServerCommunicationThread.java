@@ -1,6 +1,5 @@
 package server;
 
-import util.ClientInfo;
 import util.Message;
 import util.NetworkUtil;
 
@@ -40,8 +39,8 @@ public class ServerCommunicationThread implements Runnable
             {
                 clientSock = servSock.accept ();
                 nu = new NetworkUtil ( clientSock );
-                Message m = (Message)nu.read();
-                serverController.newMessage ( m );
+                Message message = (Message)nu.read();
+                serverController.newMessage ( message );
             }
         }
         catch ( Exception e )

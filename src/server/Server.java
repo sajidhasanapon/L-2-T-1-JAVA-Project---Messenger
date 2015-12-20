@@ -25,9 +25,10 @@ public class Server extends Application
 
         try
         {
-            new ServerConnectionThread (serverController);
+            new ConnectionThread (serverController);
             new ServerLogoutThread (serverController);
             new ServerCommunicationThread (serverController);
+            new SetClientAddressThread ( serverController );
         }
         catch ( Exception e )
         {

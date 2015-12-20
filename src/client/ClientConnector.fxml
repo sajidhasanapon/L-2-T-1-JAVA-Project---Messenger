@@ -6,25 +6,29 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ClientConnectionController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000040;" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ConnectionController">
    <children>
-      <Button fx:id="connectButton" alignment="CENTER" layoutX="232.0" layoutY="238.0" mnemonicParsing="false" onAction="#connect" prefHeight="25.0" prefWidth="136.0" text="Connect" />
-      <TextField fx:id="clientName" alignment="TOP_CENTER" layoutX="252.0" layoutY="82.0" prefHeight="25.0" prefWidth="218.0" promptText="Type your name here..." />
-      <Label layoutX="142.0" layoutY="78.0" prefHeight="33.0" prefWidth="90.0" text="Username:" textFill="#0d1ad7">
+      <Button fx:id="connectButton" alignment="CENTER" layoutX="252.0" layoutY="184.0" mnemonicParsing="false" onAction="#connect" prefHeight="33.0" prefWidth="114.0" style="-fx-background-insets: 0,1,2; -fx-background-radius: 5,3,1; -fx-background-color: #10DD27;" text="CONNECT" textFill="black">
          <font>
-            <Font name="System Bold" size="14.0" />
+            <Font name="Century Schoolbook Bold" size="14.0" />
+         </font></Button>
+      <TextField fx:id="clientName" alignment="CENTER" layoutX="252.0" layoutY="82.0" prefHeight="25.0" prefWidth="218.0" />
+      <Label layoutX="142.0" layoutY="78.0" prefHeight="33.0" prefWidth="90.0" text="Username" textFill="WHITE">
+         <font>
+            <Font name="Tahoma Bold" size="14.0" />
          </font></Label>
-      <PasswordField fx:id="passwordField" layoutX="252.0" layoutY="121.0" prefHeight="25.0" prefWidth="218.0" />
-      <Label layoutX="142.0" layoutY="123.0" prefHeight="17.0" prefWidth="90.0" text="Password :" textFill="#1533ab">
+      <PasswordField fx:id="passwordField" alignment="CENTER" layoutX="252.0" layoutY="121.0" prefHeight="25.0" prefWidth="218.0" />
+      <Label layoutX="142.0" layoutY="123.0" prefHeight="17.0" prefWidth="90.0" text="Password" textFill="WHITE">
          <font>
-            <Font name="System Bold" size="14.0" />
+            <Font name="Tahoma Bold" size="14.0" />
          </font>
       </Label>
-      <RadioButton fx:id="signup" layoutX="328.0" layoutY="183.0" mnemonicParsing="false" onAction="#newAccount" text="SIGN UP" textOverrun="CLIP">
-         <toggleGroup>
-            <ToggleGroup fx:id="connectionSelecter" />
-         </toggleGroup>
-      </RadioButton>
-      <RadioButton fx:id="login" layoutX="202.0" layoutY="183.0" mnemonicParsing="false" onAction="#oldAccount" selected="true" text="LOG IN" toggleGroup="$connectionSelecter" />
+      <Label layoutX="74.0" layoutY="241.0" prefHeight="17.0" prefWidth="77.0" text="New here?" textFill="WHITE" />
+      <Hyperlink fx:id="newAccount" layoutX="70.0" layoutY="258.0" onAction="#newAccount" prefHeight="23.0" prefWidth="150.0" text="CREATE A NEW ACCOUNT" textFill="WHITE" underline="true" />
+      <Hyperlink layoutX="375.0" layoutY="259.0" text="Forgot password?" textFill="WHITE" underline="true">
+         <font>
+            <Font size="11.0" />
+         </font>
+      </Hyperlink>
    </children>
 </Pane>

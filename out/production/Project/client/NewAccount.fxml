@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.web.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="650.0" style="-fx-background-color: #000040;" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.NewAccountController">
+   <children>
+      <Button fx:id="createButton" layoutX="280.0" layoutY="333.0" mnemonicParsing="false" onAction="#create" prefHeight="20.0" prefWidth="80.0" text="Create" />
+      <TextField fx:id="firstName" layoutX="280.0" layoutY="50.0" prefHeight="25.0" prefWidth="150.0" promptText="First Name" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="lastName" layoutX="440.0" layoutY="50.0" prefHeight="25.0" prefWidth="150.0" promptText="Last Name" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="usernameBox" layoutX="280.0" layoutY="85.0" prefHeight="25.0" prefWidth="310.0" promptText="Choose a usernmae" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="emailBox" layoutX="280.0" layoutY="120.0" prefHeight="25.0" prefWidth="310.0" promptText="Email  (Optional)" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="emailBox2" layoutX="280.0" layoutY="155.0" prefHeight="25.0" prefWidth="310.0" promptText="Retype Email" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="passwordBox" layoutX="280.0" layoutY="190.0" prefHeight="25.0" prefWidth="310.0" promptText="Password" style="-fx-text-fill: #0000FF" />
+      <TextField fx:id="passwordBox2" layoutX="280.0" layoutY="225.0" prefHeight="25.0" prefWidth="310.0" promptText="Retype Password" style="-fx-text-fill: #0000FF" />
+      <RadioButton fx:id="male" layoutX="325.0" layoutY="280.0" mnemonicParsing="false" onAction="#genderMale" text="Male" textFill="WHITE">
+         <toggleGroup>
+            <ToggleGroup fx:id="genderToggle" />
+         </toggleGroup></RadioButton>
+      <RadioButton fx:id="female" layoutX="411.0" layoutY="280.0" mnemonicParsing="false" onAction="#genderFemale" text="Female" textFill="WHITE" toggleGroup="$genderToggle" />
+      <Button layoutX="369.0" layoutY="333.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="&lt; Back" />
+      <Button layoutX="510.0" layoutY="333.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="80.0" text="Exit" />
+   </children>
+</Pane>

@@ -1,24 +1,19 @@
 package server;
 
-import client.*;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import util.ClientInfo;
 import util.Message;
 import util.NetworkUtil;
+import util.ServerNotification;
 
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Hashtable;
 
@@ -80,7 +75,7 @@ public class ServerController
         message = serverMessage.getText ();
 
         info = table.get ( username );
-        nu = info.getNu ();
+        nu = info.getNuConnection ();
         nu.write ( message );
 
         clear ();
@@ -101,8 +96,8 @@ public class ServerController
             {
                 if ( !table.containsKey ( username ) )  // user does not exist
                 {
-                    Message msg = new Message ("Invalid");
-                    nu.write(msg);
+                    nu.write ( new ServerNotification ( "invalid" ) );
+                    //nu.write ( "invalid" );
                 }
 
                 else
@@ -112,33 +107,52 @@ public class ServerController
 
                     if ( !password.equals ( realPassword ) )  // password mismatch
                     {
-                        Message msg = new Message ("Invalid");
-                        nu.write(msg);
+                        nu.write ( new ServerNotification ( "invalid" ) );
+                        //nu.write ( "invalid" );
                     }
                     else
                     {
                         if(names.contains ( username )) // already logged in somewhere else
                         {
                             info = table.get ( username );
-                            NetworkUtil existingLink = info.getNu ();
+                            NetworkUtil existingLink = info.getNuConnection ();
 
-                            Message msg = new Message ("close previous"); // terminate previous session
-                            existingLink.write(msg);
+                            // terminate previous session
+                            existingLink.write ( new ServerNotification ( "close previous" ) );
+                            //existingLink.write ( "close previous" );
 
-                            info.setNu ( nu );
+
+                            info.setNuConnection ( nu );
                             table.put ( username, info );
 
-                            msg = new Message ("new login", onlineNow); // update new connection
-                            nu.write(msg);
+                            // update new connection
+                            ArrayList<String> available = new ArrayList<String> ();
+                            for ( String onlineUser : onlineNow )
+                            {
+                                if (!onlineUser.equals ( username ) && !isBlocked ( onlineUser, username ) )
+                                {
+                                    available.add ( onlineUser );
+                                }
+                            }
+                            nu.write ( new ServerNotification ( "new login", available, info.getMessages () ) );
+                            //nu.write ( "new login" );
                         }
 
                         else  // existing user logs in. no session open elsewhere.
                         {
                             names.add ( username );
-                            info.setNu ( nu );
+                            info.setNuConnection ( nu );
                             table.put ( username, info );
-                            Message msg = new Message ("welcome back", onlineNow);
-                            nu.write(msg);
+                            ArrayList<String> available = new ArrayList<String> ();
+                            for ( String onlineUser : onlineNow )
+                            {
+                                if (!onlineUser.equals ( username ) && !isBlocked ( onlineUser, username ) )
+                                {
+                                    available.add ( onlineUser );
+                                }
+                            }
+                            nu.write ( new ServerNotification ( "hello", available, info.getMessages () ) );
+                            //nu.write ( "welcome back" );
 
                             updateAllUsers (username);
                             onlineNow.add ( username );
@@ -151,8 +165,8 @@ public class ServerController
             {
                 if(table.containsKey ( username )) // username already exists
                 {
-                    Message msg = new Message ("occupied");
-                    nu.write(msg);
+                    nu.write ( new ServerNotification ( "occupied") );
+                    //nu.write ( "occupied" );
                 }
 
                 else
@@ -160,8 +174,17 @@ public class ServerController
                     names.add ( username ); // create new account
                     info = new Info ( password, nu);
                     table.put ( username, info );
-                    Message msg = new Message ("hello", onlineNow);
-                    nu.write(msg);
+
+                    ArrayList<String> available = new ArrayList<String> ();
+                    for ( String onlineUser : onlineNow )
+                    {
+                        if (!onlineUser.equals ( username ) && !isBlocked ( onlineUser, username ) )
+                        {
+                            available.add ( onlineUser );
+                        }
+                    }
+                    nu.write ( new ServerNotification ( "hello", available, info.getMessages () ) );
+                    //nu.write ( "hello" );
 
                     updateAllUsers (username);
                     onlineNow.add ( username );
@@ -175,9 +198,10 @@ public class ServerController
         Platform.runLater ( () -> {
             names.remove ( username );
             info = table.get ( username );
-            nu = info.getNu ();
-            Message msg = new Message ("logout");
-            nu.write(msg);
+            nu = info.getNuConnection ();
+            //Message msg = new Message ("logout");
+            //nu.write(msg);
+            nu.write ( new ServerNotification ( "logout") );
             nu.closeConnection ();
 
             if (onlineNow.contains ( username ))
@@ -207,23 +231,87 @@ public class ServerController
 
     public void newMessage( Message m)throws Exception
     {
-        Info info = table.get(m.getReceiver ());
-        NetworkUtil nuCommunication = info.getNu ();
-        nuCommunication.write ( m );
+        String sender = m.getSender ();
+        String receiver = m.getReceiver ();
+        String message = m.getMessage ();
+
+        if (m.getBlock () == 1)
+        {
+            block(sender, receiver);
+        }
+
+        else
+        {
+            Info info = table.get ( sender );
+            info.outgoingMessage ( receiver, message );
+            System.out.println (sender + receiver+ message);
+
+            info = table.get ( receiver );
+            info.incomingMessage ( sender, message );
+            System.out.println (sender + receiver+ message);
+
+            if (onlineNow.contains ( receiver ))
+            {
+                info = table.get(receiver);
+                NetworkUtil nu = info.getNuGetMessage ();
+                nu.write ( m );
+            }
+        }
     }
 
-    public void updateAllUsers (String newUser)
+    public void block(String person1, String person2) // person1 = blocker, person2 = blocked
+    {
+        Info info = table.get ( person1 );
+        info.block ( person2 ); // adding to blockList stored in server
+
+        info = table.get ( person2 );
+        info.block ( person1 ); // adding to blockList stored in server
+
+        if (names.contains ( person2 )) // updating the blocked person
+        {
+            nu = info.getNuConnection ();
+            nu.write ( new ServerNotification ( "update", person1 ) );
+            //nu.write ( new ServerNotification ( "blocked, person1" ) );
+        }
+
+
+
+
+    }
+
+    public void unblock(String person1, String person2)
+    {
+        Info info = table.get ( person1 );
+        info.unblock ( person2 );
+
+        info = table.get ( person2 );
+        info.unblock ( person1 );
+    }
+
+    public boolean isBlocked(String person1, String person2)
+    {
+        Info info = table.get ( person1 );
+        return info.isBlocked ( person2 );
+    }
+
+    public void updateAllUsers (String newOnlineUser)
     {
         for ( String onlineUser : names )
         {
-            if (!onlineUser.equals ( newUser ))
+            if (!onlineUser.equals ( newOnlineUser ) && !isBlocked ( onlineUser, newOnlineUser ) )
             {
                 info = table.get ( onlineUser );
-                nu = info.getNu ();
-                nu.write ( new Message ( "update", newUser ) );
+                nu = info.getNuConnection ();
+                nu.write ( new ServerNotification ( "update", newOnlineUser ) );
             }
         }
 
+    }
+
+    public void SetClientAddress(String username, NetworkUtil nu)
+    {
+        info = table.get ( username );
+        info.setNuGetMessage (nu);
     }
 
     public void exit ()

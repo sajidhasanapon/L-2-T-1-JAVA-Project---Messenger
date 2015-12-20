@@ -1,20 +1,20 @@
 package server;
 
-import util.ClientInfo;
+import util.ConnectionInfo;
 import util.NetworkUtil;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ServerConnectionThread implements Runnable
+public class ConnectionThread implements Runnable
 {
     private Thread thr;
     private NetworkUtil nu;
     ServerSocket serverSocket;
     Socket clientSock;
     ServerController serverController;
-    ClientInfo clientInfo;
+    ConnectionInfo connectionInfo;
 
-    ServerConnectionThread ( ServerController serverController)
+    ConnectionThread ( ServerController serverController)
     {
         try
         {
@@ -26,7 +26,7 @@ public class ServerConnectionThread implements Runnable
 
         catch(Exception e )
         {
-            System.out.println ("Problem in ServerConnectionThread Construction");
+            System.out.println ("Problem in ConnectionThread Construction");
             System.out.println (e);
         }
     }
@@ -39,16 +39,16 @@ public class ServerConnectionThread implements Runnable
             {
                 clientSock = serverSocket.accept ();
                 nu = new NetworkUtil ( clientSock );
-                clientInfo = (ClientInfo) nu.read ();
-                serverController.set(clientInfo.getConnectionType (), clientInfo.getUsername (), clientInfo.getPassword (), nu);
+                connectionInfo = ( ConnectionInfo ) nu.read ();
+                serverController.set( connectionInfo.getConnectionType (), connectionInfo.getUsername (), connectionInfo.getPassword (), nu);
             }
         }
         catch ( Exception e )
         {
-            System.out.println ("Problem starting ServerConnectionThread");
-            System.out.println (clientInfo.getConnectionType ());
-            System.out.println (clientInfo.getUsername ());
-            System.out.println (clientInfo.getPassword ());
+            System.out.println ("Problem starting ConnectionThread");
+            System.out.println ( connectionInfo.getConnectionType ());
+            System.out.println ( connectionInfo.getUsername ());
+            System.out.println ( connectionInfo.getPassword ());
             System.out.println ( e );
         }
         //nc.closeConnection ();

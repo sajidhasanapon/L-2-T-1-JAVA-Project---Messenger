@@ -11,8 +11,7 @@ public class Message implements Serializable
     String sender;
     String receiver;
     String message;
-    ArrayList<String> onlineNowUsersList;
-    String newUser;
+    int block = 0;
 
     public Message ( String sender, String receiver, String message )
     {
@@ -21,25 +20,13 @@ public class Message implements Serializable
         this.message = message;
     }
 
-    public Message ( String message )
+    public Message ( String sender, String receiver, int block )
     {
-        this. sender = "serverod876$%^$^ewlfgh9ewqieuqrwrwrqeuq132rfret5678iukyu&^%&6syqwu";
-        this.message = message;
+        this.sender = sender;
+        this.receiver = receiver;
+        this.block = 1;
     }
 
-    public Message (String message, ArrayList<String> onlineNowUsersList)
-    {
-        this. sender = "serverod876$%^$^ewlfgh9ewqieuqrwrwrqeuq132rfret5678iukyu&^%&6syqwu";
-        this.message = message;
-        this.onlineNowUsersList = new ArrayList<String> (onlineNowUsersList);
-    }
-
-    public Message ( String message, String newUser )
-    {
-        this. sender = "serverod876$%^$^ewlfgh9ewqieuqrwrwrqeuq132rfret5678iukyu&^%&6syqwu";
-        this.message = message;
-        this.newUser = newUser;
-    }
 
     public String getSender ()
     {
@@ -71,13 +58,8 @@ public class Message implements Serializable
         this.message = message;
     }
 
-    public ArrayList getOnlineNowUsersList()
+    public int getBlock ()
     {
-        return onlineNowUsersList;
-    }
-
-    public String getNewUser()
-    {
-        return newUser;
+        return block;
     }
 }

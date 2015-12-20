@@ -1,6 +1,5 @@
 package server;
 
-import util.ClientInfo;
 import util.NetworkUtil;
 
 import java.net.ServerSocket;
