@@ -134,7 +134,7 @@ public class ServerController
                                     available.add ( onlineUser );
                                 }
                             }
-                            nu.write ( new ServerNotification ( "new login", available, info.getMessages () ) );
+                            nu.write ( new ServerNotification ( "new login", available, info.getMessages (), info.getmyBlockList (), info.getBlockedMeList (), info.getCommunicationList() ) );
                             //nu.write ( "new login" );
                         }
 
@@ -151,7 +151,7 @@ public class ServerController
                                     available.add ( onlineUser );
                                 }
                             }
-                            nu.write ( new ServerNotification ( "hello", available, info.getMessages () ) );
+                            nu.write ( new ServerNotification ( "hello", available, info.getMessages (), info.getmyBlockList (), info.getBlockedMeList (), info.getCommunicationList() ) );
                             //nu.write ( "welcome back" );
 
                             updateAllUsers (username);
@@ -172,7 +172,7 @@ public class ServerController
                 else
                 {
                     names.add ( username ); // create new account
-                    info = new Info ( password, nu);
+                    info = new Info ( password, nu, new ArrayList<String> (), new ArrayList<String> (), new ArrayList<String> ());
                     table.put ( username, info );
 
                     ArrayList<String> available = new ArrayList<String> ();
@@ -183,7 +183,7 @@ public class ServerController
                             available.add ( onlineUser );
                         }
                     }
-                    nu.write ( new ServerNotification ( "hello", available, info.getMessages () ) );
+                    nu.write ( new ServerNotification ( "hello", available, info.getMessages (), info.getmyBlockList (), info.getBlockedMeList (), info.getCommunicationList() ) );
                     //nu.write ( "hello" );
 
                     updateAllUsers (username);
@@ -235,22 +235,37 @@ public class ServerController
         String receiver = m.getReceiver ();
         String message = m.getMessage ();
 
-        if (m.getBlock () == 1)
+        if (m.getBlock () == 5)
+        {
+            logout ( sender );
+        }
+
+        else if (m.getBlock () == 6)
+        {
+            toggleVisibility ( sender );
+        }
+
+        else if (m.getBlock () == 1)
         {
             block(sender, receiver);
         }
 
+        else if (m.getBlock () == 2)
+        {
+            unblock(sender, receiver);
+        }
+
         else
         {
+            System.out.println (sender + " -> " + receiver + " : " + message);
+
             Info info = table.get ( sender );
             info.outgoingMessage ( receiver, message );
-            System.out.println (sender + receiver+ message);
 
             info = table.get ( receiver );
             info.incomingMessage ( sender, message );
-            System.out.println (sender + receiver+ message);
 
-            if (onlineNow.contains ( receiver ))
+            if (names.contains ( receiver ))
             {
                 info = table.get(receiver);
                 NetworkUtil nu = info.getNuGetMessage ();
@@ -264,28 +279,55 @@ public class ServerController
         Info info = table.get ( person1 );
         info.block ( person2 ); // adding to blockList stored in server
 
+        if(onlineNow.contains ( person2 ))
+        {
+            nu = info.getNuConnection ();
+            nu.write ( new ServerNotification ( "update", person2 ) ); // updating blocker
+        }
+
         info = table.get ( person2 );
-        info.block ( person1 ); // adding to blockList stored in server
+        info.blockedBy ( person1 ); // adding to blockList stored in server
 
         if (names.contains ( person2 )) // updating the blocked person
         {
             nu = info.getNuConnection ();
-            nu.write ( new ServerNotification ( "update", person1 ) );
-            //nu.write ( new ServerNotification ( "blocked, person1" ) );
+            nu.write ( new ServerNotification ( "blocked me", person1 ) );
+
+            if (onlineNow.contains ( person1 ))
+            {
+                nu.write ( new ServerNotification ( "update", person1 ) );
+            }
         }
-
-
-
-
     }
+
 
     public void unblock(String person1, String person2)
     {
         Info info = table.get ( person1 );
         info.unblock ( person2 );
 
+        if(onlineNow.contains ( person2 ))
+        {
+            nu = info.getNuConnection ();
+            nu.write ( new ServerNotification ( "update", person2 ) );
+        }
+
+
         info = table.get ( person2 );
         info.unblock ( person1 );
+
+        if (names.contains ( person2 )) // updating the previously blocked person
+        {
+            nu = info.getNuConnection ();
+            nu.write ( new ServerNotification ( "unblocked me", person1 ) );
+
+            if (onlineNow.contains ( person1 ))
+            {
+                nu.write ( new ServerNotification ( "update", person1 ) );
+            }
+        }
+
+
     }
 
     public boolean isBlocked(String person1, String person2)

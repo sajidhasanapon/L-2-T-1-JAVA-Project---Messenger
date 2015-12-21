@@ -45,7 +45,7 @@ public class ServerCommunicationThread implements Runnable
         }
         catch ( Exception e )
         {
-            System.out.println ("Problem starting ServerControllerThread\n" + e);
+            System.out.println ("Problem in ServerCommunicationThread\n" + e);
         }
         //nc.closeConnection ();
     }

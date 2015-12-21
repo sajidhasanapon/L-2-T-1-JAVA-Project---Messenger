@@ -24,7 +24,7 @@ public class Message implements Serializable
     {
         this.sender = sender;
         this.receiver = receiver;
-        this.block = 1;
+        this.block = block;
     }
 
 

@@ -1,6 +1,7 @@
 package client;
 
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.text.Text;
@@ -59,6 +60,13 @@ public class NewAccountController
     private Button createButton;
 
     @FXML
+    private Button backButton;
+
+    @FXML
+    private Button exitButton;
+
+
+    @FXML
     public void genderMale()
     {
         gender = "male";
@@ -70,10 +78,34 @@ public class NewAccountController
         gender = "female";
     }
 
+    @FXML
+    void back(ActionEvent event)
+    {
+        main.showLoginScreen ();
+    }
+
+    @FXML
+    void exit(ActionEvent event)
+    {
+        System.exit ( 0 );
+    }
+
 
     @FXML
     public void create()throws Exception
     {
+        if (usernameBox.getText ().equals ( "" ))
+        {
+            invalidUsername (1);
+            return;
+        }
+
+        else if (usernameBox.getText ().length () > 16)
+        {
+            invalidUsername ( 2 );
+            return;
+        }
+
         if (!emailBox.getText ().equals ( emailBox2.getText () ))
         {
             emailBox2.setStyle ( "-fx-control-inner-background: #FF0000" );
@@ -107,6 +139,21 @@ public class NewAccountController
     {
         usernameBox.setStyle ("-fx-control-inner-background: #FF0000" );
         usernameBox.setText ( "Username already exists !" );
+    }
+
+    public void invalidUsername (int errorType)
+    {
+        usernameBox.setStyle ("-fx-control-inner-background: #FF0000" );
+
+        if (errorType == 1)
+        {
+            usernameBox.setText ( "Username can not be empty !" );
+        }
+
+        if (errorType == 2)
+        {
+            usernameBox.setText ( "Username must be within 16 characters !" );
+        }
     }
 
 }

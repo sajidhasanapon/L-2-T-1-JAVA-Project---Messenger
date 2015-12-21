@@ -6,7 +6,7 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #000040;" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ConnectionController">
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-background-color: #00001E;" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.ConnectionController">
    <children>
       <Button fx:id="connectButton" alignment="CENTER" layoutX="252.0" layoutY="184.0" mnemonicParsing="false" onAction="#connect" prefHeight="33.0" prefWidth="114.0" style="-fx-background-insets: 0,1,2; -fx-background-radius: 5,3,1; -fx-background-color: #10DD27;" text="CONNECT" textFill="black">
          <font>
@@ -25,7 +25,7 @@
       </Label>
       <Label layoutX="74.0" layoutY="241.0" prefHeight="17.0" prefWidth="77.0" text="New here?" textFill="WHITE" />
       <Hyperlink fx:id="newAccount" layoutX="70.0" layoutY="258.0" onAction="#newAccount" prefHeight="23.0" prefWidth="150.0" text="CREATE A NEW ACCOUNT" textFill="WHITE" underline="true" />
-      <Hyperlink layoutX="375.0" layoutY="259.0" text="Forgot password?" textFill="WHITE" underline="true">
+      <Hyperlink fx:id="forgotPassword" layoutX="375.0" layoutY="259.0" onAction="#passwordRecovery" text="Forgot password?" textFill="WHITE" underline="true">
          <font>
             <Font size="11.0" />
          </font>

@@ -8,10 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import util.NetworkUtil;
+
 import java.util.ArrayList;
 import java.util.Hashtable;
 
-public class ClientMain extends Application {
+public class ClientMain extends Application
+{
 
     Stage stage;
     String serverAddress = "127.0.0.1";
@@ -24,40 +26,55 @@ public class ClientMain extends Application {
     ConnectionController connectionController;
     ArrayList<String> onlineNowUsersList;
     Hashtable<String, ArrayList<String>> messages;
+    ArrayList<String> myBlockList;
+    ArrayList<String> blockedMeList;
+    ArrayList<String> communicationList;
 
 
-    public Stage getStage () {
+    public Stage getStage ()
+    {
         return stage;
     }
 
-    public void setStage ( Stage stage ) {
+    public void setStage ( Stage stage )
+    {
         this.stage = stage;
     }
 
-    public String getUsername () {
+    public String getUsername ()
+    {
         return username;
     }
 
-    public void setUsername ( String username ) {
+    public void setUsername ( String username )
+    {
         this.username = username;
     }
 
-    public String getPassword () {
+    public String getPassword ()
+    {
         return password;
     }
 
-    public void setPassword ( String password ) {
+    public void setPassword ( String password )
+    {
         this.password = password;
     }
 
     @Override
-    public void start ( Stage primaryStage ) throws Exception {
+    public void start ( Stage primaryStage ) throws Exception
+    {
         stage = primaryStage;
+
+        new SplashScreen ().initUI ();
+        Thread.sleep ( 3000 );
         showLoginScreen ();
     }
 
-    public void showLoginScreen () {
-        try {
+    public void showLoginScreen ()
+    {
+        try
+        {
             // XML Loading using FXMLLoader
             FXMLLoader loader = new FXMLLoader ();
             loader.setLocation ( getClass ().getResource ( "ClientConnector.fxml" ) );
@@ -77,16 +94,19 @@ public class ClientMain extends Application {
             stage.show ();
         }
 
-        catch ( Exception e ) {
+        catch ( Exception e )
+        {
             System.out.println ( "Prroblem in clientMain\\ClientMain\\showConnectionScreen" + e );
         }
     }
 
-    public void showChatScreen () {
+    public void showChatScreen ()
+    {
         FXMLLoader loader = new FXMLLoader ();
         loader.setLocation ( getClass ().getResource ( "ClientChatScreen.fxml" ) );
 
-        try {
+        try
+        {
             Parent root = loader.load ();
 
             chatController = loader.getController ();
@@ -95,24 +115,21 @@ public class ClientMain extends Application {
             chatController.setServerAddress ( serverAddress );
             chatController.setStage ( stage );
             chatController.setRoot ( root );
-            chatController.setOnlineUsersList ( onlineNowUsersList );
-            chatController.setChatHistory(messages);
-
-            chatController.show();
+            chatController.set ( onlineNowUsersList, messages, myBlockList, blockedMeList, communicationList );
+            chatController.show ();
         }
 
-        catch ( Exception e ) {
+        catch ( Exception e )
+        {
             System.out.println ( "EXCEPTION : ClientMain/showChatScreen" );
             e.printStackTrace ();
         }
     }
 
 
-    public void logout ()throws Exception {
+    public void logout () throws Exception
+    {
         showLoginScreen ();
-
-        NetworkUtil nc = new NetworkUtil ( serverAddress, 44444 );
-        nc.write ( "0" + username );
 
         Platform.runLater ( () -> {
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -120,17 +137,11 @@ public class ClientMain extends Application {
             alert.setHeaderText ( "Successfully Logged Out" );
             alert.setContentText ( "" );
             alert.showAndWait ();
-
-            nuConnection.closeConnection ();
         } );
     }
 
-    public void visibilityControl() {
-        NetworkUtil nc = new NetworkUtil ( serverAddress, 44444 );
-        nc.write ( "1" + username );
-    }
-
-    public void invalidLogin () {
+    public void invalidLogin ()
+    {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.ERROR );
@@ -141,7 +152,8 @@ public class ClientMain extends Application {
         } );
     }
 
-    public void closePrevious ( NetworkUtil nu ) {
+    public void closePrevious ( NetworkUtil nu )
+    {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -156,7 +168,8 @@ public class ClientMain extends Application {
 
     }
 
-    public  void welcomeBack() {
+    public void welcomeBack ()
+    {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -173,7 +186,8 @@ public class ClientMain extends Application {
 
     }
 
-    public void signUp() {
+    public void signUp ()
+    {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -192,7 +206,8 @@ public class ClientMain extends Application {
         } );
     }
 
-    public void newLogin() {
+    public void newLogin ()
+    {
         Platform.runLater ( () -> {
 
             Alert alert = new Alert ( Alert.AlertType.WARNING );
@@ -209,31 +224,20 @@ public class ClientMain extends Application {
         } );
     }
 
-    public void occupied() {
-        Platform.runLater ( () -> {
-
-            Alert alert = new Alert ( Alert.AlertType.WARNING );
-            alert.setTitle ( "" );
-            alert.setHeaderText ( "This username already exists !" );
-            alert.setContentText ( "Try a new username." );
-            alert.showAndWait ();
-        } );
+    public void occupied ()
+    {
+        newID.usernameConflict ();
     }
 
-    public  void showMessage ( String sender, String message ) {
-        chatController.newMessage ( sender, message );
-    }
 
-    public void setOnlineUsersList ( ArrayList<String> onlineNowUsersList ) {
-        this.onlineNowUsersList = new ArrayList<> ( onlineNowUsersList );
-    }
-
-    public void updateOnlineUsersList ( String newUser ) {
+    public void updateOnlineUsersList ( String newUser )
+    {
         onlineNowUsersList.add ( newUser );
         chatController.update ( newUser );
     }
 
-    public void newAccount() throws Exception {
+    public void newAccount () throws Exception
+    {
         // XML Loading using FXMLLoader
         FXMLLoader loader = new FXMLLoader ();
         loader.setLocation ( getClass ().getResource ( "NewAccount.fxml" ) );
@@ -244,6 +248,7 @@ public class ClientMain extends Application {
         //this.newID = newID;
         newID.setClientMain ( this );
         newID.setServerAddress ( this.serverAddress );
+        this.newID = newID;
 
         // Set the primary stage
         stage.setTitle ( "Meowssenger" );
@@ -251,13 +256,28 @@ public class ClientMain extends Application {
         stage.show ();
     }
 
-    public void chatHistory( Hashtable<String, ArrayList<String>> messages)
+    public void set ( ArrayList<String> onlineNowUsersList, Hashtable<String, ArrayList<String>> messages, ArrayList<String> myBlockList, ArrayList<String> blockedMe, ArrayList<String> communicationList )
     {
+        this.onlineNowUsersList = onlineNowUsersList;
         this.messages = messages;
+        this.myBlockList = myBlockList;
+        this.blockedMeList = blockedMe;
+        this.communicationList = communicationList;
+    }
+
+    public void blockedMe ( String person )
+    {
+        chatController.blockedMe ( person );
+    }
+
+    public void unblockedMe ( String person )
+    {
+        chatController.unblockedMe ( person );
     }
 
 
-    public static void main ( String[] args ) {
+    public static void main ( String[] args )
+    {
         launch ( args );
     }
 }

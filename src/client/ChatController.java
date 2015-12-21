@@ -4,20 +4,57 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.fxml.FXML;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 import util.Message;
 import util.NetworkUtil;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Hashtable;
 
 
 public class ChatController
 {
+    @FXML
+    private TabPane tabPane;
+
+    @FXML
+    private Tab homeTab;
+
+    @FXML
+    private Tab accountControlTab;
+
+
+    @FXML
+    private ListView<String> viewCommunication;
+
+    @FXML
+    void setFromHistory ()
+    {
+        currentPerson = viewCommunication.getSelectionModel ().getSelectedItem ();
+        receiver = currentPerson;
+        tabPane.getSelectionModel ().select ( homeTab );
+        showMessage ();
+    }
+
+
+    @FXML
+    void tryToSend ( KeyEvent event ) throws Exception
+    {
+        if ( event.getCode () == KeyCode.ENTER )
+        {
+            send ();
+        }
+    }
+
+
     private ClientMain clientMain;
     private String username;
     private String receiver;
@@ -27,9 +64,13 @@ public class ChatController
     Parent root;
     int visibility = 0;
     String currentPerson = null;
-    ObservableList<String> names = FXCollections.observableArrayList ();
+    ObservableList<String> onlineNowUsersList = FXCollections.observableArrayList ();
     ObservableList<String> blockedList = FXCollections.observableArrayList ();
+    ObservableList<String> communicationList = FXCollections.observableArrayList ();
     Hashtable<String, ArrayList<String>> messages = new Hashtable<> ();
+    ArrayList<String> myBlockList;
+    ArrayList<String> blockedMeList;
+
 
     public void setServerAddress ( String serverAddress )
     {
@@ -60,11 +101,6 @@ public class ChatController
     @FXML
     private TextField writerBox;
 
-    @FXML
-    private Button sendButton;
-
-    @FXML
-    private Button clearButton;
 
     @FXML
     private Button signoutButton;
@@ -73,22 +109,81 @@ public class ChatController
     private Button blockButton;
 
     @FXML
-    Label titleBar;
+    private Button unblockButton;
+
+    @FXML
+    TextField titleBar;
 
     @FXML
     private Button visibilityButton;
 
     @FXML
-    private Label statusLabel;
+    private Button passwordButton;
+
+    @FXML
+    private Button emailButton;
+
+    @FXML
+    void changeEmail ( ActionEvent event )
+    {
+        FXMLLoader loader = new FXMLLoader ();
+        loader.setLocation ( getClass ().getResource ( "Sorry.fxml" ) );
+
+        try
+        {
+            Parent root = loader.load ();
+            Stage st = new Stage ();
+
+            SorryController sorry = loader.getController ();
+            sorry.setLabel ( "Sorry, we don't have an email changing option yet." );
+            sorry.setStage ( st );
+            st.setTitle ( username );
+            st.setScene ( new Scene ( root, 700, 500 ) );
+            st.show ();
+        }
+
+        catch ( Exception e )
+        {
+            System.out.println ( "EXCEPTION : ClientMain/showChatScreen" );
+            e.printStackTrace ();
+        }
+    }
+
+    @FXML
+    void changePassword ( ActionEvent event )
+    {
+        FXMLLoader loader = new FXMLLoader ();
+        loader.setLocation ( getClass ().getResource ( "Sorry.fxml" ) );
+
+        try
+        {
+            Parent root = loader.load ();
+            Stage st = new Stage ();
+
+            SorryController sorry = loader.getController ();
+            sorry.setLabel ( "Sorry, we don't have a password changing option yet." );
+            sorry.setStage ( st );
+            st.setTitle ( username );
+            st.setScene ( new Scene ( root, 700, 500 ) );
+            st.show ();
+        }
+
+        catch ( Exception e )
+        {
+            System.out.println ( "EXCEPTION : ClientMain/showChatScreen" );
+            e.printStackTrace ();
+        }
+    }
 
 
     public void show ()
     {
-        viewOnlineList.setItems ( names );
+        viewOnlineList.setItems ( onlineNowUsersList );
 
         stage.setTitle ( username );
-        stage.setScene ( new Scene ( root, 700, 600 ) );
+        stage.setScene ( new Scene ( root, 900, 600 ) );
         stage.show ();
+
     }
 
 
@@ -100,22 +195,20 @@ public class ChatController
     public void setUsername ( String username )
     {
         this.username = username;
+
+        visibilityButton.setStyle ( "-fx-background-color: #2FEE2A" );
+        titleBar.setText ( null );
+        receiver = null;
+        writerBox.setVisible ( false );
     }
 
 
-    @FXML
-    void clear ( ActionEvent event )
+    void send () throws Exception
     {
-        writerBox.setText ( "" );
-    }
-
-    @FXML
-    void send ( ActionEvent event ) throws Exception
-    {
-        receiver = viewOnlineList.getSelectionModel ().getSelectedItem ();
         message = writerBox.getText ();
 
-        if ( !message.equals ( null ) && !receiver.equals ( null ) )
+
+        if ( message != null && !message.equals ( "\n" ) && receiver != null && !blockedList.contains ( receiver ) && !blockedMeList.contains ( receiver ) )
         {
             Message msg = new Message ( username, receiver, message );
 
@@ -124,83 +217,100 @@ public class ChatController
             System.out.println ( message + " -> " + receiver );
             writerBox.setText ( null );
 
-            if (!messages.containsKey ( receiver ))
+            if ( !messages.containsKey ( receiver ) )
             {
                 messages.put ( receiver, new ArrayList<String> () );
+                communicationList.add ( receiver );
+                viewCommunication.setItems ( communicationList );
             }
 
-            ( messages.get ( receiver ) ).add ( "[Me" + " > " + receiver + "]   " + message + "\n" );
+            ( messages.get ( receiver ) ).add ( "[Me" + " > " + receiver + " @ " + new Date () + " ]\n" + message + "\n\n" );
 
             showMessage ();
         }
 
-        else return;
+        else
+        {
+            showMessage ();
+            return;
+        }
     }
 
     public void newMessage ( String sender, String message )
     {
-        System.out.println (sender + " : " + message);
+        System.out.println ( sender + " : " + message );
 
-        if (! messages.containsKey ( sender ) )
+        if ( !messages.containsKey ( sender ) )
         {
             messages.put ( sender, new ArrayList<String> () );
+            communicationList.add ( sender );
+            viewCommunication.setItems ( communicationList );
         }
 
-        ( messages.get ( sender ) ).add ( "[" + sender + " > Me]   " + message + "\n" );
+        ( messages.get ( sender ) ).add ( "[" + sender + " > Me" + " @ " + new Date () + " ]\n" + message + "\n\n" );
 
-        if(sender.equals ( currentPerson ))
+        if ( sender.equals ( currentPerson ) )
         {
             showMessage ();
         }
     }
 
     @FXML
-    void setCurrentPerson()
+    void setCurrentPerson ()
     {
         currentPerson = viewOnlineList.getSelectionModel ().getSelectedItem ();
-        titleBar.setText (currentPerson);
+        receiver = currentPerson;
         showMessage ();
     }
 
     public void showMessage ()
     {
-        if ( !messages.containsKey (currentPerson) )
+        titleBar.setText ( currentPerson );
+        writerBox.setVisible ( true );
+
+        if ( currentPerson == null )
         {
-            receiverBox.setText ( "Nothing to show\n\n" );
+            writerBox.setVisible ( false );
         }
 
-        else
+        if ( communicationList.contains ( currentPerson ) )
         {
             String chatHistory = "\n";
 
-            for (String s : messages.get (currentPerson))
+            for ( String s : messages.get ( currentPerson ) )
             {
                 chatHistory = chatHistory + s;
             }
 
             receiverBox.setText ( chatHistory );
+            receiverBox.positionCaret ( chatHistory.length () );
+
         }
 
-        if (blockedList.contains (currentPerson))
+        if ( blockedList.contains ( currentPerson ) )
         {
-            receiverBox.setText ( receiverBox.getText () + "\n\nYOU HAVE BLOCKED THIS PERSON" );
+            receiverBox.setText ( receiverBox.getText () + "\n\n        YOU HAVE BLOCKED THIS PERSON" );
+            writerBox.setVisible ( false );
         }
 
-        if (!names.contains ( currentPerson ))
+        if ( blockedMeList.contains ( currentPerson ) )
         {
-            sendButton.setVisible ( false );
+            receiverBox.setText ( receiverBox.getText () + "\n\n        YOU CAN NOT COMMUNICATE WITH THIS PERSON" );
+            writerBox.setVisible ( false );
         }
 
-        else
+        if ( !onlineNowUsersList.contains ( currentPerson ) && !communicationList.contains ( currentPerson ) )
         {
-            sendButton.setVisible ( true );
+            writerBox.setVisible ( false );
         }
     }
-
 
     @FXML
     void signout ( ActionEvent event ) throws Exception
     {
+        NetworkUtil nu = new NetworkUtil ( serverAddress, 55555 );
+        nu.write ( new Message ( username, null, 5 ) );
+
         clientMain.logout ();
     }
 
@@ -210,10 +320,36 @@ public class ChatController
         receiver = viewOnlineList.getSelectionModel ().getSelectedItem ();
         NetworkUtil nu = new NetworkUtil ( serverAddress, 55555 );
         nu.write ( new Message ( username, receiver, 1 ) );
-        names.remove ( receiver );
+
         blockedList.add ( receiver );
+        myBlockList.add ( receiver );
         viewBlocked.setItems ( blockedList );
+
         showMessage ();
+    }
+
+    @FXML
+    void unblock ()
+    {
+        receiver = viewBlocked.getSelectionModel ().getSelectedItem ();
+        NetworkUtil nu = new NetworkUtil ( serverAddress, 55555 );
+        nu.write ( new Message ( username, receiver, 2 ) );
+
+        blockedList.remove ( receiver );
+        myBlockList.remove ( receiver );
+        viewBlocked.setItems ( blockedList );
+
+        showMessage ();
+    }
+
+    public void blockedMe ( String person )
+    {
+        blockedMeList.add ( person );
+    }
+
+    public void unblockedMe ( String person )
+    {
+        blockedMeList.remove ( person );
     }
 
     @FXML
@@ -221,30 +357,30 @@ public class ChatController
     {
         if ( visibility == 0 )
         {
-            statusLabel.setText ( "Chat is turned off" );
+            visibilityButton.setStyle ( "-fx-background-color: #FF5816" );
             visibilityButton.setText ( "Turn on chat" );
             visibility = 1;
         }
 
         else
         {
-            statusLabel.setText ( "" );
+            visibilityButton.setStyle ( "-fx-background-color: #2FEE2A" );
             visibilityButton.setText ( "Turn off chat" );
             visibility = 0;
         }
 
-        clientMain.visibilityControl ();
-
+        NetworkUtil nu = new NetworkUtil ( serverAddress, 55555 );
+        nu.write ( new Message ( username, null, 6 ) );
     }
 
 
-    public void setOnlineUsersList ( ArrayList<String> onlineUsersList )
+    public void setOnlineNowUsersList ( ArrayList<String> onlineUsersList )
     {
         for ( String name : onlineUsersList )
         {
             if ( !name.equals ( username ) )
             {
-                names.add ( name );
+                onlineNowUsersList.add ( name );
                 System.out.println ( name );
             }
         }
@@ -254,16 +390,16 @@ public class ChatController
     {
         Platform.runLater ( () -> {
 
-            if ( names.contains ( newUser ) )
+            if ( onlineNowUsersList.contains ( newUser ) )
             {
-                names.remove ( newUser );
+                onlineNowUsersList.remove ( newUser );
             }
 
             else
             {
                 if ( !newUser.equals ( username ) )
                 {
-                    names.add ( newUser );
+                    onlineNowUsersList.add ( newUser );
                 }
             }
 
@@ -271,9 +407,27 @@ public class ChatController
         } );
     }
 
-    public void setChatHistory(Hashtable<String, ArrayList<String>>  messages)
+    public void set ( ArrayList<String> onlineNowUsersList, Hashtable<String, ArrayList<String>> messages, ArrayList<String> myBlockList, ArrayList<String> blockedMe, ArrayList<String> communicationList )
     {
+        setOnlineNowUsersList ( onlineNowUsersList );
+
         this.messages = messages;
+
+        this.myBlockList = myBlockList;
+
+        for ( String name : myBlockList )
+        {
+            blockedList.add ( name );
+        }
+        viewBlocked.setItems ( blockedList );
+
+        this.blockedMeList = blockedMe;
+
+        for ( String name : communicationList )
+        {
+            this.communicationList.add ( name );
+        }
+        viewCommunication.setItems ( this.communicationList );
     }
 }
 

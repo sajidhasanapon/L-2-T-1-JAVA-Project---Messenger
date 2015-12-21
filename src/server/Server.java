@@ -26,7 +26,6 @@ public class Server extends Application
         try
         {
             new ConnectionThread (serverController);
-            new ServerLogoutThread (serverController);
             new ServerCommunicationThread (serverController);
             new SetClientAddressThread ( serverController );
         }

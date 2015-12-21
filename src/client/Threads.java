@@ -2,6 +2,9 @@ package client;
 
 import util.*;
 
+import java.util.ArrayList;
+import java.util.Hashtable;
+
 /**
  * Created by Sajid Hasan on 12/16/2015.
  */
@@ -32,7 +35,6 @@ public class Threads
                 while ( true )
                 {
                     Message m = ( Message ) nuGetMessage.read ();
-                    //System.out.println ( m.getMessage () );
                     chatController.newMessage ( m.getSender (), m.getMessage () );
                 }
             }
@@ -54,6 +56,7 @@ public class Threads
         private NetworkUtil nc;
         ClientMain clientMain;
 
+
         public ConnectionThread ( NetworkUtil nc, ClientMain clientMain )
         {
             this.nc = nc;
@@ -70,7 +73,14 @@ public class Threads
                 while ( true )
                 {
                     ServerNotification serverNotification = ( ServerNotification ) nc.read ();
+
                     String serverCommand = serverNotification.getCommand ();
+                    ArrayList<String> onlineNowUsersList = serverNotification.getOnlineNowUsersList ();
+                    Hashtable<String, ArrayList<String>> messages = serverNotification.getMessages ();
+                    ArrayList<String> myBlockList = serverNotification.getMyBlockedList ();
+                    ArrayList<String> blockedMe = serverNotification.getBlockedMeList ();
+                    ArrayList<String> communicationList = serverNotification.getCommunicationList();
+
 
                     System.out.println ( serverCommand );
 
@@ -83,8 +93,8 @@ public class Threads
                     else if ( serverCommand.equals ( "welcome back" ) )
                     {
                         clientMain.welcomeBack ();
-                        clientMain.setOnlineUsersList ( serverNotification.getOnlineNowUsersList () );
-                        clientMain.chatHistory(serverNotification.getMessages ());
+
+                        clientMain.set(onlineNowUsersList, messages, myBlockList, blockedMe, communicationList);
                     }
 
                     else if ( serverCommand.equals ( "invalid" ) )
@@ -95,15 +105,15 @@ public class Threads
                     else if ( serverCommand.equals ( "new login" ) )
                     {
                         clientMain.newLogin ();
-                        clientMain.setOnlineUsersList ( serverNotification.getOnlineNowUsersList () );
-                        clientMain.chatHistory(serverNotification.getMessages ());
+
+                        clientMain.set(onlineNowUsersList, messages, myBlockList, blockedMe, communicationList);
                     }
 
                     else if ( serverCommand.equals ( "hello" ) )
                     {
                         clientMain.signUp ();
-                        clientMain.setOnlineUsersList ( serverNotification.getOnlineNowUsersList () );
-                        clientMain.chatHistory(serverNotification.getMessages ());
+
+                        clientMain.set(onlineNowUsersList, messages, myBlockList, blockedMe, communicationList);
                     }
 
                     else if ( serverCommand.equals ( "occupied" ) )
@@ -117,10 +127,14 @@ public class Threads
 
                     }
 
-                    else if (serverCommand.equals ( "blocked" ))
+                    else if (serverCommand.equals ( "blocked me" ))
                     {
-                        clientMain.updateOnlineUsersList ( serverNotification.getNewOnlineUser () );
-                        // blocked code
+                        clientMain.blockedMe ( serverNotification.getNewOnlineUser () );
+                    }
+
+                    else if (serverCommand.equals ( "unblocked me" ))
+                    {
+                        clientMain.unblockedMe(serverNotification.getNewOnlineUser ());
                     }
                 }
             }

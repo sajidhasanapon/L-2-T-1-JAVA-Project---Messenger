@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+
+<Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.40" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.SorryController">
+   <children>
+      <Label layoutX="152.0" layoutY="81.0" prefHeight="71.0" prefWidth="218.0" text="Oops !">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Label>
+      <Label fx:id="label" alignment="TOP_LEFT" layoutX="152.0" layoutY="157.0" prefHeight="26.0" prefWidth="376.0" wrapText="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" layoutX="152.0" layoutY="192.0" prefHeight="40.0" prefWidth="320.0" text="But don't worry, we are trying our best to add this feature in the next version of Meowssenger." wrapText="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label alignment="TOP_LEFT" layoutX="152.0" layoutY="252.0" prefHeight="40.0" prefWidth="320.0" text="We sincerely apologise for your inconvenience. Please have patience, and keep supporting us." wrapText="true">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Button fx:id="backButton" layoutX="238.0" layoutY="323.0" mnemonicParsing="false" onAction="#back" prefHeight="25.0" prefWidth="149.0" text="&lt; Go back" />
+   </children>
+</Pane>
